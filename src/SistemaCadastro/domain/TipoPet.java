@@ -1,5 +1,9 @@
 package SistemaCadastro.domain;
 
 public enum TipoPet {
-    CACHORRO,GATO
+    CACHORRO,GATO;
+
+    TipoPet() {
+
+    }
 }

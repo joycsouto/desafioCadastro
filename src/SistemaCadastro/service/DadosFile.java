@@ -1,6 +1,8 @@
 package SistemaCadastro.service;
 
 import SistemaCadastro.domain.Pet;
+import SistemaCadastro.domain.SexoPet;
+import SistemaCadastro.domain.TipoPet;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,10 +11,15 @@ import java.util.regex.Pattern;
 
 public class DadosFile {
 
-    String name;
-    String email;
-    Integer age;
-    Double height;
+    private static final Object NAO_INFORMADO =  ("Não Informado");
+    String namePet;
+    TipoPet tipoPet;
+    SexoPet sexoPet;
+    String enderecoPet;
+    Double idadePet;
+    Double pesoPet;
+    String racaPet;
+         final String VALOR_NAO_INFORMADO  = ("Não Informado");
     Scanner scanner = new Scanner(System.in);
     File[] diretorioFile = new File("Files").listFiles();
     File filePerguntas = new File("Files/formulario.txt");
@@ -24,6 +31,7 @@ public class DadosFile {
     ArrayList<String> usuariosCadastrados = new ArrayList<>();
 
     Pet pet = new Pet();
+
     public void menu() {
         int resposta;
         try {
@@ -44,11 +52,11 @@ public class DadosFile {
         }
         switch (resposta) {
             case 1:
-                cadastrarUser();
+                cadastrarPet();
                 menu();
                 break;
             case 2:
-                usuariosSistema();
+                petsNoSistema();
                 menu();
                 break;
             case 3:
@@ -60,7 +68,7 @@ public class DadosFile {
 
                 break;
             case 5:
-                pesquisarNome();
+                pesquisarNomePet();
 
                 break;
             case 6:
@@ -86,48 +94,78 @@ public class DadosFile {
 
     }
 
-    public void cadastrarUser() {
+    public void cadastrarPet() {
         lendoFile();
         scanner.nextLine();
         System.out.println("Responda abaixo");
-        name = scanner.nextLine();
-        pet.setName(name);
+        namePet = scanner.nextLine();
         String padraoNomePet = "([\\p{L}]+)\s([\\p{L}]+)";
-        boolean isPadraoNomePet = Pattern.matches(padraoNomePet,name);
-
+        boolean isPadraoNomePet = Pattern.matches(padraoNomePet, namePet);
+        Object nome = namePet == null ? NAO_INFORMADO : namePet;
+        pet.setNomePet(namePet);
         if (!isPadraoNomePet) {
             throw new RuntimeException("O nome deve ter sobrenome e não pode conter caracteres especiais.");
         }
 
-        String padraoEmail = "[a-zA-Z0-9]+@gmail.com";
-        //  Pattern pattern2 = Pattern.compile(padraoEmail);
-        // user.setEmail(scanner.nextLine());
-        email += pet.setEmail(scanner.nextLine());
-        boolean isPadrao = Pattern.matches(padraoEmail, email);
-        if (!isPadrao) {
-            throw new RuntimeException("Seu email precisa ter @gmail.com");
+        try {
+            String tipoPetUser = scanner.nextLine().toUpperCase();
+            tipoPet = TipoPet.valueOf(tipoPetUser);
+            Object tipo = tipoPet == null ? NAO_INFORMADO : tipoPet;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
-        if (listPet.contains(email)) {
-            throw new RuntimeException("Esse email ja existe");
+        try {
+
+            String tipoSexoPetUser = scanner.nextLine().toUpperCase();
+            sexoPet = SexoPet.valueOf(tipoSexoPetUser);
+            Object sexo = tipoPet == null ? NAO_INFORMADO : sexoPet;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
-
-
-        age = pet.setAge(scanner.nextInt());
-        if (age < 18) {
-            throw new RuntimeException("A idade precisa ser apartir de 18 anos.");
-
-        }
-
-
-        String padraoVirgula = "(\\d{1},\\d{2})";
-        height = pet.setHeight(scanner.nextDouble());
-        boolean isMarcher = Pattern.matches(padraoVirgula, height.toString());
-        if (!isMarcher) {
-            throw new RuntimeException("O número precisa ser separado por vírgula");
+        try {
+            Integer numPet = scanner.nextInt();
+            String ruaPet = scanner.nextLine();
+            String cityPet = scanner.nextLine();
+            Object num = numPet == null || numPet == 0 ? NAO_INFORMADO : numPet;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
 
 
-        listPet.add(new Pet(name, email, age, height));
+           try{idadePet = scanner.nextDouble();
+               Object idade = idadePet == null || idadePet == 0 ? NAO_INFORMADO : idadePet;
+           if (idadePet > 20 || idadePet < 0){
+           throw new RuntimeException("Idade Inválida");
+           }
+           } catch (RuntimeException e) {
+               throw new RuntimeException(e);
+           }
+
+
+
+      try{
+          pesoPet =scanner.nextDouble();
+          Object peso = pesoPet == null || pesoPet == 0 ? NAO_INFORMADO : idadePet;
+          if (pesoPet < 0.5 || pesoPet < 60.0){
+              throw new RuntimeException("Peso Inválido");
+
+          }
+      } catch (RuntimeException e) {
+          throw new RuntimeException(e);
+      }
+      try{racaPet = scanner.next();
+          Object raca = racaPet == null ? NAO_INFORMADO : racaPet;
+      String padraoRaca = "[\\p{L}]";
+      boolean isPadraoRaca = Pattern.matches(padraoRaca,racaPet);
+      if (!isPadraoRaca){
+          throw new RuntimeException("Digte apenas letras.");
+      }
+      } catch (RuntimeException e) {
+          throw new RuntimeException(e);
+      }
+
+
+      //  listPet.add(new Pet(namePet));
         criarArquivo();
 
 
@@ -150,7 +188,7 @@ public class DadosFile {
     public void escrevendoFile() {
 
         File diretorio = new File("Files");
-        File userFile = new File(diretorio, name.toUpperCase().trim() + ".txt");
+        File userFile = new File(diretorio, namePet.toUpperCase().trim() + ".txt");
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(userFile, true))) {
             System.out.println(userFile.createNewFile());
             bufferedWriter.write(pet.toString());
@@ -162,13 +200,13 @@ public class DadosFile {
 
     }
 
-    public void usuariosSistema() {
+    public void petsNoSistema() {
         if (listPet != null) {
             for (Pet pet : listPet) {
                 System.out.println(pet);
             }
         }
-        if (userCadastrados() != null) {
+        if (petsCadastrados() != null) {
             for (String usuarios : users) {
                 if (usuarios != null) {
                     System.out.println(usuarios);
@@ -177,7 +215,7 @@ public class DadosFile {
         }
     }
 
-    public String[] userCadastrados() {
+    public String[] petsCadastrados() {
 
         for (File file : diretorioFile) {
             if (!file.getName().equals("formulario.txt")) {
@@ -260,24 +298,24 @@ public class DadosFile {
     }
 
     public void cerificando() {
-        userCadastrados();
+        petsCadastrados();
         for (String dadoSeparados : users) {
             String[] dados = dadoSeparados.split(",");
-            Pet pet = new Pet(dados[0], dados[1], Integer.parseInt(dados[2]), Double.parseDouble(dados[3]));
+            //Pet pet = new Pet(dados[0], dados[1], Integer.parseInt(dados[2]), Double.parseDouble(dados[3]));
             listPet.add(pet);
 
         }
     }
 
-    public void pesquisarNome() {
+    public void pesquisarNomePet() {
         try {
-            userCadastrados();
+            petsCadastrados();
             System.out.println("Pesquise por nome,email ou idade:");
             String pesquisa = scanner.next();
             for (Pet usuarios : listPet) {
                 boolean isMarcher = Pattern.matches(pesquisa, usuarios.getNomePet());
                 boolean isMarcher2 = Pattern.matches(pesquisa, usuarios.getEnderecoPet());
-                boolean isMarcher3 = Pattern.matches(pesquisa, usuarios.getAge().toString());
+                boolean isMarcher3 = Pattern.matches(pesquisa, usuarios.getIdade().toString());
                 if (isMarcher || isMarcher2 || isMarcher3) {
                     System.out.println(usuarios);
                 }

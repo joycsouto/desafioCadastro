@@ -2,8 +2,8 @@ package SistemaCadastro.domain;
 
 public class Pet {
     private String nomePet;
-    private String enderecoPet;
-    private Integer idade;//**
+    private EnderecoPet enderecoPet;
+    private Double idade;//**
     private Double peso;//***
     private String raça;
 
@@ -11,7 +11,7 @@ public class Pet {
     }
 
 
-    public Pet(String nomePet, String enderecoPet, Integer idade, Double peso, String raça) {
+    public Pet(String nomePet, EnderecoPet enderecoPet, Double idade, Double peso, String raça) {
         this.nomePet = nomePet;
         this.enderecoPet = enderecoPet;
         this.idade = idade;
@@ -27,19 +27,19 @@ public class Pet {
         return nomePet;
     }
 
-    public String getEnderecoPet() {
-        return enderecoPet;
+    public CharSequence getEnderecoPet() {
+        return (CharSequence) enderecoPet;
     }
 
-    public void setEnderecoPet(String enderecoPet) {
+    public void setEnderecoPet(EnderecoPet enderecoPet) {
         this.enderecoPet = enderecoPet;
     }
 
-    public Integer getIdade() {
+    public Double getIdade() {
         return idade;
     }
 
-    public void setIdade(Integer idade) {
+    public void setIdade(Double idade) {
         this.idade = idade;
     }
 
