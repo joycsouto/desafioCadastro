@@ -1,10 +1,13 @@
 package SistemaCadastro.service;
 
+import SistemaCadastro.domain.EnderecoPet;
 import SistemaCadastro.domain.Pet;
 import SistemaCadastro.domain.SexoPet;
 import SistemaCadastro.domain.TipoPet;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -15,10 +18,13 @@ public class DadosFile {
     String namePet;
     TipoPet tipoPet;
     SexoPet sexoPet;
-    String enderecoPet;
     Double idadePet;
     Double pesoPet;
     String racaPet;
+
+    Integer numPet ;
+    String ruaPet ;
+    String cityPet;
          final String VALOR_NAO_INFORMADO  = ("Não Informado");
     Scanner scanner = new Scanner(System.in);
     File[] diretorioFile = new File("Files").listFiles();
@@ -110,7 +116,9 @@ public class DadosFile {
         try {
             String tipoPetUser = scanner.nextLine().toUpperCase();
             tipoPet = TipoPet.valueOf(tipoPetUser);
-            Object tipo = tipoPet == null ? NAO_INFORMADO : tipoPet;
+            if (tipoPet.name().isEmpty()){
+                tipoPet = TipoPet.valueOf(VALOR_NAO_INFORMADO);
+            }
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
@@ -123,16 +131,20 @@ public class DadosFile {
             throw new RuntimeException(e);
         }
         try {
-            Integer numPet = scanner.nextInt();
-            String ruaPet = scanner.nextLine();
-            String cityPet = scanner.nextLine();
+             numPet = scanner.nextInt();
+           ruaPet = scanner.next();
+             cityPet = scanner.next();
+
             Object num = numPet == null || numPet == 0 ? NAO_INFORMADO : numPet;
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
 
 
-           try{idadePet = scanner.nextDouble();
+
+           try{
+                scanner.nextLine();
+               idadePet = scanner.nextDouble();
                Object idade = idadePet == null || idadePet == 0 ? NAO_INFORMADO : idadePet;
            if (idadePet > 20 || idadePet < 0){
            throw new RuntimeException("Idade Inválida");
@@ -145,19 +157,20 @@ public class DadosFile {
 
       try{
           pesoPet =scanner.nextDouble();
-          Object peso = pesoPet == null || pesoPet == 0 ? NAO_INFORMADO : idadePet;
-          if (pesoPet < 0.5 || pesoPet < 60.0){
+          Object peso = pesoPet == null || pesoPet == 0 ? NAO_INFORMADO : pesoPet;
+          if (pesoPet < 0.5 || pesoPet > 60){
               throw new RuntimeException("Peso Inválido");
 
           }
       } catch (RuntimeException e) {
           throw new RuntimeException(e);
       }
+
       try{racaPet = scanner.next();
           Object raca = racaPet == null ? NAO_INFORMADO : racaPet;
       String padraoRaca = "[\\p{L}]";
       boolean isPadraoRaca = Pattern.matches(padraoRaca,racaPet);
-      if (!isPadraoRaca){
+      if (isPadraoRaca){
           throw new RuntimeException("Digte apenas letras.");
       }
       } catch (RuntimeException e) {
@@ -165,7 +178,7 @@ public class DadosFile {
       }
 
 
-      //  listPet.add(new Pet(namePet));
+      Pet pet = new Pet(namePet,new EnderecoPet(numPet,ruaPet,cityPet),idadePet,pesoPet,racaPet,sexoPet,tipoPet);
         criarArquivo();
 
 
@@ -186,18 +199,27 @@ public class DadosFile {
     }
 
     public void escrevendoFile() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm");
+        String dataFormatada = LocalDateTime.now().format(dateTimeFormatter);
 
-        File diretorio = new File("Files");
-        File userFile = new File(diretorio, namePet.toUpperCase().trim() + ".txt");
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(userFile, true))) {
-            System.out.println(userFile.createNewFile());
-            bufferedWriter.write(pet.toString());
-            bufferedWriter.newLine();
+        File diretorio = new File("petsCadastrados");
+        if (!diretorio.exists()){
+            diretorio.mkdir();
+        }
+        String nomeFilePet = dataFormatada +"-"+namePet.toUpperCase().replaceAll(" ", "")+".txt";
+        File userFile = new File(diretorio,  nomeFilePet);
+        try {
+            boolean criado = userFile.createNewFile();
+            System.out.println("Arquivo criado: " + criado);
+
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(userFile, true))) {
+                bufferedWriter.write(pet.toString());
+                bufferedWriter.newLine();
+            }
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao escrever no arquivo: " + e.getMessage(), e);
         }
-
     }
 
     public void petsNoSistema() {

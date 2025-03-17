@@ -6,17 +6,34 @@ public class Pet {
     private Double idade;//**
     private Double peso;//***
     private String raça;
+    private  SexoPet sexoPet;
+    private TipoPet tipoPet;
 
     public Pet() {
     }
 
 
-    public Pet(String nomePet, EnderecoPet enderecoPet, Double idade, Double peso, String raça) {
+    public Pet(String nomePet, EnderecoPet enderecoPet, Double idade, Double peso, String raça, SexoPet sexoPet, TipoPet tipoPet) {
         this.nomePet = nomePet;
         this.enderecoPet = enderecoPet;
         this.idade = idade;
         this.peso = peso;
         this.raça = raça;
+        this.sexoPet = sexoPet;
+        this.tipoPet = tipoPet;
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "nomePet='" + nomePet + '\'' +
+                ", enderecoPet=" + enderecoPet +
+                ", idade=" + idade +
+                ", peso=" + peso +
+                ", raça='" + raça + '\'' +
+                ", sexoPet=" + sexoPet +
+                ", tipoPet=" + tipoPet +
+                '}';
     }
 
     public void setNomePet(String nomePet) {
@@ -57,5 +74,21 @@ public class Pet {
 
     public void setRaça(String raça) {
         this.raça = raça;
+    }
+
+    public SexoPet getSexoPet() {
+        return sexoPet;
+    }
+
+    public void setSexoPet(SexoPet sexoPet) {
+        this.sexoPet = sexoPet;
+    }
+
+    public TipoPet getTipoPet() {
+        return tipoPet;
+    }
+
+    public void setTipoPet(TipoPet tipoPet) {
+        this.tipoPet = tipoPet;
     }
 }
