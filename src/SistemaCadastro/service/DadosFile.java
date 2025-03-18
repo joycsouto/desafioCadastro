@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DadosFile {
 
-    private static final Object NAO_INFORMADO =  ("Não Informado");
+    private static final Object NAO_INFORMADO = ("Não Informado");
     String namePet;
     TipoPet tipoPet;
     SexoPet sexoPet;
@@ -22,28 +23,36 @@ public class DadosFile {
     Double pesoPet;
     String racaPet;
 
-    Integer numPet ;
-    String ruaPet ;
+    Integer numPet;
+    String ruaPet;
     String cityPet;
-         final String VALOR_NAO_INFORMADO  = ("Não Informado");
+    EnderecoPet enderecoPet = new EnderecoPet(numPet, ruaPet, cityPet);
+
+    final String VALOR_NAO_INFORMADO = ("Não Informado");
+
     Scanner scanner = new Scanner(System.in);
     File[] diretorioFile = new File("Files").listFiles();
     File filePerguntas = new File("Files/formulario.txt");
+
     ArrayList<Pet> listPet = new ArrayList<>();
     ArrayList<String> perguntasList = new ArrayList<>();
-    String line;
-    int linha = 0;
     String[] users;
+    String[] usersNow;
+    String line;
+
+    int linha = 0;
+    int contarNumeroPerguntas;
+
     ArrayList<String> usuariosCadastrados = new ArrayList<>();
 
-    Pet pet = new Pet();
+    Pet pet = new Pet(namePet, enderecoPet, idadePet, pesoPet, racaPet, sexoPet, tipoPet);
 
     public void menu() {
         int resposta;
         try {
             System.out.println("1 - Cadastrar um novo pet\n" +
-                    "2 - Alterar os dados do pet cadastrado\n\n" +
-                    "3 - Deletar um pet cadastrado\n\n" +
+                    "2 - Alterar os dados do pet cadastrado\n" +
+                    "3 - Deletar um pet cadastrado\n" +
                     "4 - Listar todos os pets cadastrados\n" +
                     "5 -  Listar pets por algum critério(idade, nome, raça)\n" +
                     "6 -   Sair" +
@@ -93,6 +102,7 @@ public class DadosFile {
                 System.out.println(line);
                 perguntasList.add(line);
 
+                contarNumeroPerguntas = line.length();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -101,6 +111,7 @@ public class DadosFile {
     }
 
     public void cadastrarPet() {
+
         lendoFile();
         scanner.nextLine();
         System.out.println("Responda abaixo");
@@ -108,7 +119,6 @@ public class DadosFile {
         String padraoNomePet = "([\\p{L}]+)\s([\\p{L}]+)";
         boolean isPadraoNomePet = Pattern.matches(padraoNomePet, namePet);
         Object nome = namePet == null ? NAO_INFORMADO : namePet;
-        pet.setNomePet(namePet);
         if (!isPadraoNomePet) {
             throw new RuntimeException("O nome deve ter sobrenome e não pode conter caracteres especiais.");
         }
@@ -116,7 +126,7 @@ public class DadosFile {
         try {
             String tipoPetUser = scanner.nextLine().toUpperCase();
             tipoPet = TipoPet.valueOf(tipoPetUser);
-            if (tipoPet.name().isEmpty()){
+            if (tipoPet.name().isEmpty()) {
                 tipoPet = TipoPet.valueOf(VALOR_NAO_INFORMADO);
             }
         } catch (RuntimeException e) {
@@ -127,13 +137,14 @@ public class DadosFile {
             String tipoSexoPetUser = scanner.nextLine().toUpperCase();
             sexoPet = SexoPet.valueOf(tipoSexoPetUser);
             Object sexo = tipoPet == null ? NAO_INFORMADO : sexoPet;
+
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
         try {
-             numPet = scanner.nextInt();
-           ruaPet = scanner.next();
-             cityPet = scanner.next();
+            numPet = scanner.nextInt();
+            ruaPet = scanner.next();
+            cityPet = scanner.next();
 
             Object num = numPet == null || numPet == 0 ? NAO_INFORMADO : numPet;
         } catch (RuntimeException e) {
@@ -141,44 +152,44 @@ public class DadosFile {
         }
 
 
-
-           try{
-                scanner.nextLine();
-               idadePet = scanner.nextDouble();
-               Object idade = idadePet == null || idadePet == 0 ? NAO_INFORMADO : idadePet;
-           if (idadePet > 20 || idadePet < 0){
-           throw new RuntimeException("Idade Inválida");
-           }
-           } catch (RuntimeException e) {
-               throw new RuntimeException(e);
-           }
-
+        try {
+            scanner.nextLine();
+            idadePet = scanner.nextDouble();
+            Object idade = idadePet == null || idadePet == 0 ? NAO_INFORMADO : idadePet;
+            if (idadePet > 20 || idadePet < 0) {
+                throw new RuntimeException("Idade Inválida");
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
 
 
-      try{
-          pesoPet =scanner.nextDouble();
-          Object peso = pesoPet == null || pesoPet == 0 ? NAO_INFORMADO : pesoPet;
-          if (pesoPet < 0.5 || pesoPet > 60){
-              throw new RuntimeException("Peso Inválido");
+        try {
+            pesoPet = scanner.nextDouble();
+            Object peso = pesoPet == null || pesoPet == 0 ? NAO_INFORMADO : pesoPet;
+            if (pesoPet < 0.5 || pesoPet > 60) {
+                throw new RuntimeException("Peso Inválido");
 
-          }
-      } catch (RuntimeException e) {
-          throw new RuntimeException(e);
-      }
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
 
-      try{racaPet = scanner.next();
-          Object raca = racaPet == null ? NAO_INFORMADO : racaPet;
-      String padraoRaca = "[\\p{L}]";
-      boolean isPadraoRaca = Pattern.matches(padraoRaca,racaPet);
-      if (isPadraoRaca){
-          throw new RuntimeException("Digte apenas letras.");
-      }
-      } catch (RuntimeException e) {
-          throw new RuntimeException(e);
-      }
+        try {
+            racaPet = scanner.next();
+            Object raca = racaPet == null ? NAO_INFORMADO : racaPet;
+            String padraoRaca = "[\\p{L}]";
+            boolean isPadraoRaca = Pattern.matches(padraoRaca, racaPet);
+            if (isPadraoRaca) {
+                throw new RuntimeException("Digte apenas letras.");
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
 
 
-      Pet pet = new Pet(namePet,new EnderecoPet(numPet,ruaPet,cityPet),idadePet,pesoPet,racaPet,sexoPet,tipoPet);
+        Pet pet = new Pet(namePet, new EnderecoPet(numPet, ruaPet, cityPet), idadePet, pesoPet, racaPet, sexoPet, tipoPet);
+        listPet.add(pet);
         criarArquivo();
 
 
@@ -203,18 +214,20 @@ public class DadosFile {
         String dataFormatada = LocalDateTime.now().format(dateTimeFormatter);
 
         File diretorio = new File("petsCadastrados");
-        if (!diretorio.exists()){
+        if (!diretorio.exists()) {
             diretorio.mkdir();
         }
-        String nomeFilePet = dataFormatada +"-"+namePet.toUpperCase().replaceAll(" ", "")+".txt";
-        File userFile = new File(diretorio,  nomeFilePet);
+        String nomeFilePet = dataFormatada + "-" + namePet.toUpperCase().replaceAll(" ", "") + ".txt";
+        File userFile = new File(diretorio, nomeFilePet);
         try {
             boolean criado = userFile.createNewFile();
             System.out.println("Arquivo criado: " + criado);
 
             try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(userFile, true))) {
+
                 bufferedWriter.write(pet.toString());
                 bufferedWriter.newLine();
+
             }
 
         } catch (IOException e) {
@@ -232,6 +245,7 @@ public class DadosFile {
             for (String usuarios : users) {
                 if (usuarios != null) {
                     System.out.println(usuarios);
+
                 }
             }
         }
@@ -263,7 +277,7 @@ public class DadosFile {
         System.out.println("Escreva a pergunta:");
         String pergunta = scanner.nextLine();
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePerguntas, true))) {
-
+            perguntasList.add(pergunta);
             bufferedWriter.newLine();
             bufferedWriter.write(numeroPergutas() + 1 + " - " + pergunta);
             menu();
@@ -331,18 +345,54 @@ public class DadosFile {
 
     public void pesquisarNomePet() {
         try {
-            petsCadastrados();
-            System.out.println("Pesquise por nome,email ou idade:");
-            String pesquisa = scanner.next();
-            for (Pet usuarios : listPet) {
-                boolean isMarcher = Pattern.matches(pesquisa, usuarios.getNomePet());
-                boolean isMarcher2 = Pattern.matches(pesquisa, usuarios.getEnderecoPet());
-                boolean isMarcher3 = Pattern.matches(pesquisa, usuarios.getIdade().toString());
-                if (isMarcher || isMarcher2 || isMarcher3) {
-                    System.out.println(usuarios);
-                }
-            }
-        } catch (RuntimeException e) {
+
+            System.out.println("Quais critérios vc deseja procurar?Até 2" +
+                    "1-Nome ou sobrenome\n" +
+                    "2-Sexo\n" +
+                    "3-Idade\n" +
+                    "4-Peso\n" +
+                    "5-Raça\n" +
+                    "6-Endereço");
+            Integer criterio = scanner.nextInt();
+            scanner.nextLine();
+                    switch (criterio) {
+                        case 1:
+                            System.out.println("Digite qual nome deseja buscar:");
+                            String buscaName = scanner.nextLine();
+//                            boolean isMarcherName1 = Pattern.matches(buscaName, petsNow.getNomePet() );
+//                            boolean isMarcherName2 =  petsSistema.matches(buscaName) ;
+//                            if (isMarcherName1 || isMarcherName2){
+//                                System.out.println(petsNow);
+//                                System.out.println(petsSistema);
+//                            }
+                            for (Pet petsNow : listPet) {
+                                if (petsNow.getNomePet().toLowerCase().contains(buscaName)) {
+                                    System.out.println(petsNow);
+                                }
+                            }
+                            for (String petSistema : petsCadastrados()) {
+                                if (petSistema.toLowerCase().contains(buscaName)) {
+                                    System.out.println(petSistema);
+                                }
+                            }
+                            break;
+                        case 2:
+                            System.out.println("Digite qual sexo deseja buscar:");
+                            String buscaSexo = scanner.nextLine();
+//                    boolean isMarcherSexo2 =  petsSistema.matches(buscaSexo) ;
+//                    if (listPet.contains(buscaSexo)|| isMarcherSexo2){
+//                        System.out.println(petsNow);
+//                        System.out.println(petsSistema);
+//                    }
+
+
+//                boolean isMarcher2 = Pattern.matches(pesquisa, usuarios.getEnderecoPet());
+//                boolean isMarcher3 = Pattern.matches(pesquisa, usuarios.getIdade().toString());
+//                if (isMarcher || isMarcher2 || isMarcher3) {
+//                    System.out.println(usuarios);
+//                }
+                    }}
+         catch (RuntimeException e) {
             throw new RuntimeException("Usuário Inexistente, tente novamente", e);
         }
     }

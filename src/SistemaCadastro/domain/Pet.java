@@ -6,8 +6,10 @@ public class Pet {
     private Double idade;//**
     private Double peso;//***
     private String raça;
-    private  SexoPet sexoPet;
+    private SexoPet sexoPet;
     private TipoPet tipoPet;
+    private int numPerguntas;
+
 
     public Pet() {
     }
@@ -26,13 +28,13 @@ public class Pet {
     @Override
     public String toString() {
         return "Pet{" +
-                "nomePet='" + nomePet + '\'' +
-                ", enderecoPet=" + enderecoPet +
-                ", idade=" + idade +
-                ", peso=" + peso +
-                ", raça='" + raça + '\'' +
-                ", sexoPet=" + sexoPet +
-                ", tipoPet=" + tipoPet +
+                 nomePet + "\n" +
+                enderecoPet + "\n" +
+                idade + "\n" +
+                peso + "\n" +
+                raça + "\n" + '\'' +
+                sexoPet + "\n" +
+                tipoPet + "\n" +
                 '}';
     }
 
@@ -76,8 +78,8 @@ public class Pet {
         this.raça = raça;
     }
 
-    public SexoPet getSexoPet() {
-        return sexoPet;
+    public void getSexoPet() {
+        this.sexoPet = sexoPet;
     }
 
     public void setSexoPet(SexoPet sexoPet) {
